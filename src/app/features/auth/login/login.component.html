@@ -1,0 +1,78 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <!-- Header -->
+    <div class="bank-header">
+      <div class="bank-logo">
+        <i class="fas fa-university bank-icon"></i>
+        <h2>Al Baraka Digital</h2>
+        <p class="bank-subtitle">Banque Digitale Sécurisée</p>
+      </div>
+
+      <div class="security-badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>Système sécurisé</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Adresse e-mail</label>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="exemple@banque.com"
+            class="form-control"
+            [class.is-invalid]="email?.invalid && email?.touched"
+          >
+        </div>
+        <small class="error" *ngIf="email?.invalid && email?.touched">
+          Email invalide ou requis
+        </small>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="form-control"
+            [class.is-invalid]="password?.invalid && password?.touched"
+          >
+        </div>
+        <small class="error" *ngIf="password?.invalid && password?.touched">
+          Mot de passe requis (min. 6 caractères)
+        </small>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Button -->
+      <button type="submit" class="btn-login" [disabled]="loginForm.invalid || isLoading">
+        <i *ngIf="!isLoading" class="fas fa-arrow-right"></i>
+        <span *ngIf="isLoading" class="loader"></span>
+        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+      </button>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        <p>Support technique : <strong>5555-1234</strong></p>
+      </div>
+
+    </form>
+  </div>
+</div>

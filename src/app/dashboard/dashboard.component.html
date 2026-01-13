@@ -1,0 +1,25 @@
+<!-- src/app/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <div class="header">
+    <div class="user-info">
+      <h2>bonjour {{currentUser?.fullName}}</h2>
+      <p class="role">role: {{currentUser?.role}}</p>
+      <p class="account"> N C: {{currentUser?.accountNumber}}</p>
+    </div>
+    <button class="logout-btn" (click)="logout()">logout </button>
+  </div>
+
+  <div class="content">
+    <h3>dashboard</h3>
+    <div class="cards">
+      <div class="card">
+        <h4>information </h4>
+        <p>email: {{currentUser?.email}}</p>
+      </div>
+      <div class="card">
+        <h4>token</h4>
+        <p class="token">{{currentUser?.accessToken | slice:0:30}}...</p>
+      </div>
+    </div>
+  </div>
+</div>
