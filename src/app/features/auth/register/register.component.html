@@ -1,12 +1,12 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="register-container">
+  <div class="register-card">
 
     <!-- Header -->
     <div class="bank-header">
       <div class="bank-logo">
         <i class="fas fa-university bank-icon"></i>
         <h2>Al Baraka Digital</h2>
-        <p class="bank-subtitle">Banque Digitale Sécurisée</p>
+        <p class="bank-subtitle">Créer un compte</p>
       </div>
 
       <div class="security-badge">
@@ -16,7 +16,26 @@
     </div>
 
     <!-- Form -->
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullName">Nom complet</label>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            id="fullName"
+            formControlName="fullName"
+            placeholder="Votre nom complet"
+            class="form-control"
+            [class.is-invalid]="fullName?.invalid && fullName?.touched"
+          >
+        </div>
+        <small class="error" *ngIf="fullName?.invalid && fullName?.touched">
+          Nom requis (min. 3 caractères)
+        </small>
+      </div>
 
       <!-- Email -->
       <div class="form-group">
@@ -62,15 +81,15 @@
       </div>
 
       <!-- Button -->
-      <button type="submit" class="btn-login" [disabled]="loginForm.invalid || isLoading">
-        <i *ngIf="!isLoading" class="fas fa-arrow-right"></i>
+      <button type="submit" class="btn-register" [disabled]="registerForm.invalid || isLoading">
+        <i *ngIf="!isLoading" class="fas fa-check"></i>
         <span *ngIf="isLoading" class="loader"></span>
-        {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+        {{ isLoading ? 'Inscription...' : 'S\'inscrire' }}
       </button>
 
       <!-- Footer -->
-      <div class="login-footer">
-        <p>Vous n'avez pas de compte? <a routerLink="/register">S'inscrire maintenant</a></p>
+      <div class="register-footer">
+        <p>Vous avez déjà un compte? <a routerLink="/login">Se connecter</a></p>
         <p>Support technique : <strong>5555-1234</strong></p>
       </div>
 
