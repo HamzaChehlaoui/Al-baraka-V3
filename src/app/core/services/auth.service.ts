@@ -113,4 +113,32 @@ export class AuthService {
   }
 }
 
+  /**
+   * Vérifier si l'utilisateur a le rôle spécifié
+   * @param role Le rôle à vérifier (CLIENT, AGENT, ADMIN)
+   * @returns true si l'utilisateur a ce rôle, false sinon
+   */
+  hasRole(role: string): boolean {
+    const currentUser = this.getCurrentUser();
+    return currentUser?.role === role;
+  }
+
+  /**
+   * Vérifier si l'utilisateur a l'un des rôles spécifiés
+   * @param roles Les rôles à vérifier
+   * @returns true si l'utilisateur a au moins un des rôles, false sinon
+   */
+  hasAnyRole(roles: string[]): boolean {
+    const currentUser = this.getCurrentUser();
+    return currentUser ? roles.includes(currentUser.role) : false;
+  }
+
+  /**
+   * Récupérer le rôle de l'utilisateur actuel
+   * @returns Le rôle de l'utilisateur ou null
+   */
+  getUserRole(): string | null {
+    return this.getCurrentUser()?.role || null;
+  }
+
 }
