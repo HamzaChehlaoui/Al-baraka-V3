@@ -1,0 +1,61 @@
+<div class="client-dashboard">
+  <header class="dashboard-header">
+    <h1>Client Dashboard</h1>
+    <div class="user-info">
+      <span>{{ currentUser?.fullName }} ({{ currentUser?.email }})</span>
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <nav class="client-nav">
+    <ul>
+      <li><a routerLink="/client/deposit">Dépôt</a></li>
+      <li><a routerLink="/client/withdrawal">Retrait</a></li>
+      <li><a routerLink="/client/transfer">Virement</a></li>
+      <li><a routerLink="/client/operations">Historique</a></li>
+    </ul>
+  </nav>
+
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <main class="dashboard-content">
+    <section class="account-summary">
+      <h2>Solde du Compte</h2>
+      <div class="balance-card">
+        <div *ngIf="isLoading" class="loading-state">
+          Chargement du solde...
+        </div>
+        <div *ngIf="!isLoading">
+          <p class="balance-amount">{{ (accountBalance | number: '1.2-2') || 0 }} DH</p>
+          <p class="account-number">Compte: {{ currentUser?.accountNumber }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="recent-operations">
+      <h2>Opérations Récentes</h2>
+      <div *ngIf="isLoading" class="loading-state">
+        Chargement des opérations...
+      </div>
+      <div *ngIf="!isLoading && recentOperations.length > 0; else noOperations" class="operations-list">
+        <div *ngFor="let op of recentOperations" class="operation-item">
+          <div class="operation-header">
+            <span class="operation-type">{{ op.type || 'N/A' }}</span>
+            <span class="operation-status" [ngClass]="'status-' + (op.status ? op.status.toLowerCase() : 'unknown')">
+              {{ op.status || 'En attente' }}
+            </span>
+          </div>
+          <div class="operation-details">
+            <span class="amount">{{ op.amount }} {{ op.currency }}</span>
+            <span class="date">{{ op.createdAt | date: 'short' }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #noOperations>
+        <p class="no-data" *ngIf="!isLoading">Aucune opération disponible</p>
+      </ng-template>
+    </section>
+  </main>
+</div>
