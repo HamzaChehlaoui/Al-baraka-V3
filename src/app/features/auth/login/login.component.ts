@@ -17,12 +17,11 @@ export class LoginComponent {
   isLoading: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly authService: AuthService
   ) {
     this.loginForm = this.fb.group({
-
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -44,13 +43,14 @@ export class LoginComponent {
     console.log('Sending login request:', credentials);
 
     this.authService.login(credentials).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log('Login successful:', response);
         this.isLoading = false;
 
-        this.router.navigate(['/dashboard']);
+        // Rediriger vers la page appropriée selon le rôle
+        this.redirectByRole(response.role);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Login error:', error);
         this.isLoading = false;
 
@@ -63,6 +63,28 @@ export class LoginComponent {
         }
       }
     });
+  }
+
+  /**
+   * Rediriger l'utilisateur vers la page appropriée selon son rôle
+   * @param role Le rôle de l'utilisateur (CLIENT, AGENT, ADMIN)
+   */
+  private redirectByRole(role: string): void {
+    switch (role) {
+      case 'CLIENT':
+        this.router.navigate(['/client']);
+        break;
+      case 'AGENT':
+        this.router.navigate(['/agent']);
+        break;
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      default:
+        // Fallback vers dashboard
+        console.warn(`Rôle inconnu: ${role}`);
+        this.router.navigate(['/dashboard']);
+    }
   }
 
   get email() { return this.loginForm.get('email'); }

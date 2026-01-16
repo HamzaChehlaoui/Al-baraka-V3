@@ -17,9 +17,9 @@ export class RegisterComponent {
   isLoading: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly authService: AuthService
   ) {
     this.registerForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -45,13 +45,14 @@ export class RegisterComponent {
     console.log('Sending register request:', credentials);
 
     this.authService.register(credentials).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         console.log('Register successful:', response);
         this.isLoading = false;
 
-        this.router.navigate(['/dashboard']);
+        // Rediriger vers la page appropriée selon le rôle
+        this.redirectByRole(response.role);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Register error:', error);
         this.isLoading = false;
 
@@ -64,6 +65,28 @@ export class RegisterComponent {
         }
       }
     });
+  }
+
+  /**
+   * Rediriger l'utilisateur vers la page appropriée selon son rôle
+   * @param role Le rôle de l'utilisateur (CLIENT, AGENT, ADMIN)
+   */
+  private redirectByRole(role: string): void {
+    switch (role) {
+      case 'CLIENT':
+        this.router.navigate(['/client']);
+        break;
+      case 'AGENT':
+        this.router.navigate(['/agent']);
+        break;
+      case 'ADMIN':
+        this.router.navigate(['/admin']);
+        break;
+      default:
+        // Fallback vers dashboard
+        console.warn(`Rôle inconnu: ${role}`);
+        this.router.navigate(['/dashboard']);
+    }
   }
 
   get fullName() { return this.registerForm.get('fullName'); }
