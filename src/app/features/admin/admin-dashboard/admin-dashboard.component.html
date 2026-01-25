@@ -1,0 +1,135 @@
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <i class="fas fa-university"></i>
+      <h2>Al Baraka Digital</h2>
+      <span class="subtitle">Administration</span>
+    </div>
+    <div class="user-badge">
+      <i class="fas fa-user-shield"></i>
+      <span>{{ currentUser?.fullName }}</span>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="section-header">
+      <i class="fas fa-chart-pie"></i>
+      <span>Statistiques Générales</span>
+    </div>
+    <div *ngIf="isLoading" class="loading-text">
+      <span class="loader"></span> Chargement...
+    </div>
+    <div *ngIf="!isLoading" class="stats-grid">
+      <div class="stat-card users">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalUsers }}</span>
+          <span class="stat-label">Total Utilisateurs</span>
+        </div>
+      </div>
+      <div class="stat-card clients">
+        <div class="stat-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalClients }}</span>
+          <span class="stat-label">Clients</span>
+        </div>
+      </div>
+      <div class="stat-card agents">
+        <div class="stat-icon">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalAgents }}</span>
+          <span class="stat-label">Agents</span>
+        </div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ pendingOperationsCount }}</span>
+          <span class="stat-label">Opérations en Attente</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Section -->
+  <div class="nav-section">
+    <div class="section-header">
+      <i class="fas fa-cogs"></i>
+      <span>Gestion du Système</span>
+    </div>
+    <div class="nav-grid">
+      <a routerLink="/admin/users" class="nav-btn">
+        <div class="nav-icon users">
+          <i class="fas fa-users-cog"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Gérer Utilisateurs</span>
+          <span class="nav-desc">Ajouter, modifier, supprimer</span>
+        </div>
+        <span class="nav-badge">{{ totalUsers }}</span>
+      </a>
+      <a routerLink="/admin/users" [queryParams]="{filter: 'CLIENT'}" class="nav-btn">
+        <div class="nav-icon clients">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Voir Clients</span>
+          <span class="nav-desc">Liste des clients</span>
+        </div>
+        <span class="nav-badge client">{{ totalClients }}</span>
+      </a>
+      <a routerLink="/admin/users" [queryParams]="{filter: 'AGENT'}" class="nav-btn">
+        <div class="nav-icon agents">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Voir Agents</span>
+          <span class="nav-desc">Liste des agents</span>
+        </div>
+        <span class="nav-badge agent">{{ totalAgents }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="actions-section">
+    <div class="section-header">
+      <i class="fas fa-bolt"></i>
+      <span>Actions Rapides</span>
+    </div>
+    <div class="actions-grid">
+      <button (click)="refreshData()" class="action-btn">
+        <i class="fas fa-sync-alt"></i>
+        <span>Actualiser les données</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button (click)="logout()" class="btn-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Support technique : <strong>5555-1234</strong></p>
+  </div>
+
+</div>
