@@ -14,7 +14,7 @@ export class OperationsHistoryComponent implements OnInit {
   operations: Operation[] = [];
   isLoading: boolean = false;
   errorMessage: string = '';
-  currentPage: number = 1;
+  currentPage: number = 0;
   pageSize: number = 10;
   totalCount: number = 0;
 
@@ -31,7 +31,7 @@ export class OperationsHistoryComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.operationService.getOperationHistory(this.currentPage - 1, this.pageSize).subscribe({
+    this.operationService.getOperationHistory(this.currentPage, this.pageSize).subscribe({
       next: (response: any) => {
         console.log('✅ Operations received:', response);
 

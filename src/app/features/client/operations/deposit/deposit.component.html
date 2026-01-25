@@ -40,6 +40,21 @@
         <small class="info">Max 500 caractères</small>
       </div>
 
+      <!-- Alerte et upload pour montants élevés -->
+      <div *ngIf="requiresJustification" class="alert alert-warning">
+        ⚠️ Un montant supérieur à 10 000 DH nécessite un justificatif (PDF, JPG, PNG)
+      </div>
+
+      <div *ngIf="requiresJustification" class="form-group">
+        <label>Justificatif *</label>
+        <app-file-upload
+          label="Télécharger le justificatif"
+          [config]="{accept: '.pdf,.jpg,.jpeg,.png', maxSize: 5, multiple: false}"
+          (fileSelected)="onFileSelected($event)"
+          (fileRemoved)="onFileRemoved()"
+        ></app-file-upload>
+      </div>
+
       <div *ngIf="errorMessage" class="alert alert-error">
         {{ errorMessage }}
       </div>
