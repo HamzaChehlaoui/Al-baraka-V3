@@ -251,7 +251,6 @@ export class FileUploadComponent {
   handleFile(file: File): void {
     this.error = '';
 
-    // Vérifier le type de fichier
     const acceptedTypes = this.config.accept.split(',').map(t => t.trim());
     const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
     const fileMimeType = file.type;
@@ -268,7 +267,6 @@ export class FileUploadComponent {
       return;
     }
 
-    // Vérifier la taille
     const maxSizeBytes = this.config.maxSize * 1024 * 1024;
     if (file.size > maxSizeBytes) {
       this.error = `Fichier trop volumineux. Taille max: ${this.config.maxSize}MB`;

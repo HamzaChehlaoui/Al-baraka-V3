@@ -3,39 +3,18 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  fullName: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  accessToken: string;
-  email: string;
-  fullName: string;
-  role: string;
-  accountNumber: string;
-}
+import { LoginRequest, RegisterRequest, LoginResponse } from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
-
-  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
+  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
-
+  constructor(private readonly http: HttpClient, @Inject(PLATFORM_ID) private readonly platformId: Object) {
     if(isPlatformBrowser(this.platformId)){
-
       this.loadUserFromStorage();
     }
   }
@@ -65,21 +44,19 @@ export class AuthService {
   }
 
   logout(): void {
-  if (isPlatformBrowser(this.platformId)) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+    this.currentUserSubject.next(null);
   }
-  this.currentUserSubject.next(null);
-}
 
-
- getToken(): string | null {
-  if (isPlatformBrowser(this.platformId)) {
-    return localStorage.getItem('token');
+  getToken(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
-  return null;
-}
-
 
   isAuthenticated(): boolean {
     return !!this.getToken();
@@ -89,56 +66,41 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
- private saveUserToStorage(user: LoginResponse): void {
-  if (isPlatformBrowser(this.platformId)) {
-    localStorage.setItem('token', user.accessToken);
-    localStorage.setItem('user', JSON.stringify(user));
-  }
-}
-
-
- private loadUserFromStorage(): void {
-  if (!isPlatformBrowser(this.platformId)) return;
-
-  const token = localStorage.getItem('token');
-  const userStr = localStorage.getItem('user');
-
-  if (token && userStr) {
-    try {
-      const user: LoginResponse = JSON.parse(userStr);
-      this.currentUserSubject.next(user);
-    } catch (error) {
-      console.error('Error parsing user from storage:', error);
+  private saveUserToStorage(user: LoginResponse): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('token', user.accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
     }
   }
-}
 
-  /**
-   * Vérifier si l'utilisateur a le rôle spécifié
-   * @param role Le rôle à vérifier (CLIENT, AGENT, ADMIN)
-   * @returns true si l'utilisateur a ce rôle, false sinon
-   */
+  private loadUserFromStorage(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+
+    if (token && userStr) {
+      try {
+        const user: LoginResponse = JSON.parse(userStr);
+        this.currentUserSubject.next(user);
+      } catch (error) {
+        console.error('Error parsing user from storage:', error);
+      }
+    }
+  }
+
   hasRole(role: string): boolean {
     const currentUser = this.getCurrentUser();
     return currentUser?.role === role;
   }
 
-  /**
-   * Vérifier si l'utilisateur a l'un des rôles spécifiés
-   * @param roles Les rôles à vérifier
-   * @returns true si l'utilisateur a au moins un des rôles, false sinon
-   */
   hasAnyRole(roles: string[]): boolean {
     const currentUser = this.getCurrentUser();
     return currentUser ? roles.includes(currentUser.role) : false;
   }
 
-  /**
-   * Récupérer le rôle de l'utilisateur actuel
-   * @returns Le rôle de l'utilisateur ou null
-   */
   getUserRole(): string | null {
     return this.getCurrentUser()?.role || null;
   }
-
 }
+

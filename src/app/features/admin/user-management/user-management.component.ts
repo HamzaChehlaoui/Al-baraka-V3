@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserService, User } from '../../../core/services/user.service';
+import { UserService } from '../../../core/services/user.service';
+import { User } from '../../../core/models';
 
 @Component({
   selector: 'app-user-management',
@@ -16,16 +17,11 @@ export class UserManagementComponent implements OnInit {
   currentUser: any = null;
   users: User[] = [];
   selectedUser: User | null = null;
-
-  // Pagination
   currentPage: number = 0;
   pageSize: number = 10;
   totalCount: number = 0;
-
-  // Filtres
   roleFilter: string = '';
   searchQuery: string = '';
-
   isLoading: boolean = false;
   actionInProgress: boolean = false;
   errorMessage: string = '';
@@ -46,7 +42,6 @@ export class UserManagementComponent implements OnInit {
       return;
     }
 
-    // Vérifier les query params pour le filtre
     this.route.queryParams.subscribe(params => {
       if (params['filter']) {
         this.roleFilter = params['filter'];
@@ -82,7 +77,7 @@ export class UserManagementComponent implements OnInit {
 
   private handleUsersResponse(response: any): void {
     // Handle UserListResponse format from service
-    if (response && response.users) {
+    if (response?.users) {
       this.users = response.users;
       this.totalCount = response.totalCount || response.users.length;
     } else if (Array.isArray(response)) {
@@ -92,7 +87,7 @@ export class UserManagementComponent implements OnInit {
       this.users = [];
       this.totalCount = 0;
     }
-    console.log('Users loaded:', this.users);
+
     this.isLoading = false;
   }
 
@@ -179,7 +174,6 @@ export class UserManagementComponent implements OnInit {
       },
       error: (error: any) => {
         this.actionInProgress = false;
-        // Display detailed validation errors if available
         if (error.error?.errors) {
           const errorMessages = Object.entries(error.error.errors)
             .map(([field, msg]) => `${field}: ${msg}`)

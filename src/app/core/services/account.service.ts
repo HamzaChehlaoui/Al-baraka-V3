@@ -1,29 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
-export interface AccountBalance {
-  accountNumber: string;
-  balance: number;
-  currency: string;
-  lastUpdated: string;
-}
-
-export interface AccountInfo {
-  accountNumber: string;
-  balance: number;
-  currency: string;
-  accountHolder: string;
-  accountType: string;
-  createdAt: string;
-  status: string;
-}
-
-export interface RecentOperationsResponse {
-  operations: any[];
-  totalCount: number;
-}
+import { AccountInfo } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -33,9 +12,6 @@ export class AccountService {
 
   constructor(private readonly http: HttpClient) {}
 
-  /**
-   * Récupérer le solde du compte
-   */
   getAccountBalance(): Observable<{ balance: number }> {
     return this.http.get<any>(`${this.apiUrl}`).pipe(
       catchError((error: any) => {
@@ -45,9 +21,6 @@ export class AccountService {
     );
   }
 
-  /**
-   * Récupérer les informations du compte
-   */
   getAccountInfo(): Observable<AccountInfo> {
     return this.http.get<any>(`${this.apiUrl}`).pipe(
       catchError((error: any) => {
@@ -57,3 +30,4 @@ export class AccountService {
     );
   }
 }
+

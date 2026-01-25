@@ -33,7 +33,6 @@ export class TransferComponent {
       description: ['', [Validators.maxLength(500)]]
     });
 
-    // Surveiller les changements du montant
     this.transferForm.get('amount')?.valueChanges.subscribe((value) => {
       this.requiresJustification = value > 10000;
     });
@@ -66,7 +65,6 @@ export class TransferComponent {
 
     this.operationService.createTransfer(recipientAccountNumber, amount, 'DH', description).subscribe({
       next: (response) => {
-        // Si un justificatif est requis, l'uploader
         if (this.requiresJustification && this.justificationFile) {
           this.uploadJustification(response.id);
         } else {

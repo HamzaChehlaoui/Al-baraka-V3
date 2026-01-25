@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { OperationService, Operation, DocumentDto } from '../../../core/services/operation.service';
+import { OperationService } from '../../../core/services/operation.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { Operation, DocumentDto } from '../../../core/models';
 
 @Component({
   selector: 'app-pending-operations',
@@ -23,8 +24,6 @@ export class PendingOperationsComponent implements OnInit {
   currentPage: number = 0;
   pageSize: number = 10;
   totalCount: number = 0;
-
-  // Document viewer
   showDocumentViewer: boolean = false;
   documentUrl: string = '';
   selectedDocument: DocumentDto | null = null;

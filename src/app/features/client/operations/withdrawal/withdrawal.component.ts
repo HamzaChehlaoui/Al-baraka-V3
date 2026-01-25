@@ -31,7 +31,6 @@ export class WithdrawalComponent {
       withdrawalMethod: ['ATM', [Validators.required]]
     });
 
-    // Surveiller les changements du montant
     this.withdrawalForm.get('amount')?.valueChanges.subscribe((value) => {
       this.requiresJustification = value > 10000;
     });

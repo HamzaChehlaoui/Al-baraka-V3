@@ -31,7 +31,6 @@ export class DepositComponent {
       paymentMethod: ['CARD', [Validators.required]]
     });
 
-    // Surveiller les changements du montant
     this.depositForm.get('amount')?.valueChanges.subscribe((value) => {
       this.requiresJustification = value > 10000;
     });

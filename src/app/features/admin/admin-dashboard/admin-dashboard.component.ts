@@ -14,13 +14,10 @@ import { OperationService } from '../../../core/services/operation.service';
 })
 export class AdminDashboardComponent implements OnInit {
   currentUser: any = null;
-
-  // Statistiques
   totalUsers: number = 0;
   totalClients: number = 0;
   totalAgents: number = 0;
   pendingOperationsCount: number = 0;
-
   isLoading: boolean = false;
   errorMessage: string = '';
 
@@ -46,7 +43,6 @@ export class AdminDashboardComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Charger les statistiques des utilisateurs
     this.userService.getUsers(0, 1).subscribe({
       next: (response: any) => {
         this.totalUsers = response.totalCount || 0;
@@ -56,7 +52,6 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    // Charger le nombre de clients
     this.userService.getUsers(0, 1, 'CLIENT').subscribe({
       next: (response: any) => {
         this.totalClients = response.totalCount || 0;
@@ -66,7 +61,6 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    // Charger le nombre d'agents
     this.userService.getUsers(0, 1, 'AGENT').subscribe({
       next: (response: any) => {
         this.totalAgents = response.totalCount || 0;
@@ -78,7 +72,6 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    // Charger les opérations en attente
     this.operationService.getPendingOperations(0, 10).subscribe({
       next: (response: any) => {
         this.pendingOperationsCount = response.totalCount || 0;

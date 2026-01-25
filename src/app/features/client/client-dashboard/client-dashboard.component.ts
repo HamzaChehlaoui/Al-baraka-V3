@@ -38,7 +38,6 @@ export class ClientDashboardComponent implements OnInit {
       return;
     }
 
-    // Initialiser les données du dashboard
     this.loadAccountData();
   }
 
@@ -46,7 +45,6 @@ export class ClientDashboardComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Combiner les deux requêtes pour mieux gérer les erreurs
     combineLatest([
       this.accountService.getAccountBalance().pipe(
         catchError((error: any) => {
@@ -63,20 +61,15 @@ export class ClientDashboardComponent implements OnInit {
     ]).subscribe({
       next: ([balanceData, operationsData]: any) => {
         this.isLoading = false;
-        console.log('✅ Données reçues - Balance:', balanceData);
-        console.log('✅ Données reçues - Operations:', operationsData);
 
-        // Vérifier les erreurs individuelles
         const errors: string[] = [];
 
         if (!balanceData) {
           errors.push('Impossible de charger le solde du compte');
         } else {
-          // balanceData peut être un array ou un objet
           const account = Array.isArray(balanceData) ? balanceData[0] : balanceData;
           if (account && account.balance) {
             this.accountBalance = account.balance;
-            console.log('💰 Solde défini à:', this.accountBalance);
           } else {
             errors.push('Impossible de charger le solde du compte');
           }
@@ -85,7 +78,6 @@ export class ClientDashboardComponent implements OnInit {
         if (!operationsData) {
           errors.push('Impossible de charger l\'historique des opérations');
         } else {
-          // operationsData vient de OperationService.getOperationHistory()
           if (operationsData.operations && Array.isArray(operationsData.operations)) {
             this.recentOperations = operationsData.operations;
           } else if (Array.isArray(operationsData)) {
@@ -93,7 +85,6 @@ export class ClientDashboardComponent implements OnInit {
           } else {
             this.recentOperations = [];
           }
-          console.log('📋 Opérations définies à:', this.recentOperations);
         }
 
         if (errors.length > 0) {

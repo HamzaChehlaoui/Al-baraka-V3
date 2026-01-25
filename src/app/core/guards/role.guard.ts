@@ -37,12 +37,10 @@ export class RoleGuard implements CanActivate {
 
     const requiredRoles: string[] = route.data['roles'] || [];
 
-    // Si aucun rôle requis, autoriser l'accès
     if (requiredRoles.length === 0) {
       return true;
     }
 
-    // Récupérer le rôle de l'utilisateur actuel
     const currentUser = this.authService.getCurrentUser();
     const userRole = currentUser?.role;
 
@@ -51,7 +49,6 @@ export class RoleGuard implements CanActivate {
     }
 
     console.warn(`Access denied: User role '${userRole}' not in required roles:`, requiredRoles);
-    // Redirect to appropriate dashboard based on user role
     if (userRole === 'CLIENT') {
       this.router.navigate(['/client/dashboard']);
     } else if (userRole === 'AGENT') {

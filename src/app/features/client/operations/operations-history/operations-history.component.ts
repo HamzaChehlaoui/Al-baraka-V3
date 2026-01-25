@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { OperationService, Operation } from '../../../../core/services/operation.service';
+import { OperationService } from '../../../../core/services/operation.service';
+import { Operation } from '../../../../core/models';
 
 @Component({
   selector: 'app-operations-history',
@@ -33,26 +34,20 @@ export class OperationsHistoryComponent implements OnInit {
 
     this.operationService.getOperationHistory(this.currentPage, this.pageSize).subscribe({
       next: (response: any) => {
-        console.log('✅ Operations received:', response);
-
-        // Traiter la réponse selon son format
-        let  operationsData: any[] = [];
+        let operationsData: any[] = [];
         let totalCount: number = 0;
 
         if (Array.isArray(response)) {
-          // Si la réponse est un array direct
           operationsData = response;
           totalCount = response.length;
         } else if (response.operations && Array.isArray(response.operations)) {
-          // Si la réponse a une propriété operations
           operationsData = response.operations;
           totalCount = response.totalCount || response.operations.length;
         }
 
-        // Transformer les données pour correspondre à l'interface Operation
         this.operations = operationsData.map((op: any) => ({
           ...op,
-          createdAt: op.date || op.createdAt // Normaliser la date
+          createdAt: op.date || op.createdAt
         }));
 
         this.totalCount = totalCount;

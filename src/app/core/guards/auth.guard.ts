@@ -23,7 +23,6 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    // تخطي التحقق على السيرفر - السماح بالمرور ثم التحقق على المتصفح
     if (!isPlatformBrowser(this.platformId)) {
       return true;
     }
