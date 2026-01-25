@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import {
   CanActivate,
   Router,
@@ -14,13 +15,19 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
+    // تخطي التحقق على السيرفر - السماح بالمرور ثم التحقق على المتصفح
+    if (!isPlatformBrowser(this.platformId)) {
+      return true;
+    }
+
     if (this.authService.isAuthenticated()) {
       return true;
     }

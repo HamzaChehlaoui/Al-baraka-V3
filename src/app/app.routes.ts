@@ -1,54 +1,93 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
-import { ClientDashboardComponent } from './features/client/client-dashboard/client-dashboard.component';
-import { DepositComponent } from './features/client/operations/deposit/deposit.component';
-import { WithdrawalComponent } from './features/client/operations/withdrawal/withdrawal.component';
-import { TransferComponent } from './features/client/operations/transfer/transfer.component';
-import { OperationsHistoryComponent } from './features/client/operations/operations-history/operations-history.component';
-import { AgentDashboardComponent } from './features/agent/agent-dashboard/agent-dashboard.component';
-import { PendingOperationsComponent } from './features/agent/pending-operations/pending-operations.component';
-
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
 
+  // Auth routes - lazy loaded
+  {
+    path: 'login',
+    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
+  },
+
+  // Client routes - lazy loaded
   {
     path: 'client',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['CLIENT'] },
     children: [
-      { path: '', component: ClientDashboardComponent },
-      { path: 'dashboard', component: ClientDashboardComponent },
-      { path: 'deposit', component: DepositComponent },
-      { path: 'withdrawal', component: WithdrawalComponent },
-      { path: 'transfer', component: TransferComponent },
-      { path: 'operations', component: OperationsHistoryComponent }
+      {
+        path: '',
+        loadComponent: () => import('./features/client/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent)
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/client/client-dashboard/client-dashboard.component').then(m => m.ClientDashboardComponent)
+      },
+      {
+        path: 'deposit',
+        loadComponent: () => import('./features/client/operations/deposit/deposit.component').then(m => m.DepositComponent)
+      },
+      {
+        path: 'withdrawal',
+        loadComponent: () => import('./features/client/operations/withdrawal/withdrawal.component').then(m => m.WithdrawalComponent)
+      },
+      {
+        path: 'transfer',
+        loadComponent: () => import('./features/client/operations/transfer/transfer.component').then(m => m.TransferComponent)
+      },
+      {
+        path: 'operations',
+        loadComponent: () => import('./features/client/operations/operations-history/operations-history.component').then(m => m.OperationsHistoryComponent)
+      }
     ]
   },
 
+  // Agent routes - lazy loaded
   {
     path: 'agent',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['AGENT'] },
     children: [
-      { path: '', component: AgentDashboardComponent },
-      { path: 'dashboard', component: AgentDashboardComponent },
-      { path: 'pending-operations', component: PendingOperationsComponent }
+      {
+        path: '',
+        loadComponent: () => import('./features/agent/agent-dashboard/agent-dashboard.component').then(m => m.AgentDashboardComponent)
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/agent/agent-dashboard/agent-dashboard.component').then(m => m.AgentDashboardComponent)
+      },
+      {
+        path: 'pending-operations',
+        loadComponent: () => import('./features/agent/pending-operations/pending-operations.component').then(m => m.PendingOperationsComponent)
+      }
     ]
   },
 
+  // Admin routes - lazy loaded
   {
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ADMIN'] },
     children: [
-      // Admin routes will be added here
+      {
+        path: '',
+        loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/user-management/user-management.component').then(m => m.UserManagementComponent)
+      }
     ]
   },
 
