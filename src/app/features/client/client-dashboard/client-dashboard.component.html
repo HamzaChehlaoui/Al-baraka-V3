@@ -1,61 +1,139 @@
-<div class="client-dashboard">
-  <header class="dashboard-header">
-    <h1>Client Dashboard</h1>
-    <div class="user-info">
-      <span>{{ currentUser?.fullName }} ({{ currentUser?.email }})</span>
-      <button (click)="logout()" class="btn-logout">Logout</button>
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <i class="fas fa-university bank-icon"></i>
+      <h2>Al Baraka Digital</h2>
+      <p class="bank-subtitle">Espace Client</p>
     </div>
-  </header>
 
-  <nav class="client-nav">
-    <ul>
-      <li><a routerLink="/client/deposit">Dépôt</a></li>
-      <li><a routerLink="/client/withdrawal">Retrait</a></li>
-      <li><a routerLink="/client/transfer">Virement</a></li>
-      <li><a routerLink="/client/operations">Historique</a></li>
-    </ul>
-  </nav>
+    <div class="user-badge">
+      <i class="fas fa-user-circle"></i>
+      <span>{{ currentUser?.fullName }}</span>
+    </div>
+  </div>
 
-  <div *ngIf="errorMessage" class="alert alert-error">
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
     {{ errorMessage }}
   </div>
 
-  <main class="dashboard-content">
-    <section class="account-summary">
-      <h2>Solde du Compte</h2>
-      <div class="balance-card">
-        <div *ngIf="isLoading" class="loading-state">
-          Chargement du solde...
-        </div>
-        <div *ngIf="!isLoading">
-          <p class="balance-amount">{{ (accountBalance | number: '1.2-2') || 0 }} DH</p>
-          <p class="account-number">Compte: {{ currentUser?.accountNumber }}</p>
-        </div>
+  <!-- Balance Section -->
+  <div class="balance-section">
+    <label>Solde du Compte</label>
+    <div class="balance-box">
+      <div *ngIf="isLoading" class="loading-text">
+        <span class="loader"></span> Chargement...
       </div>
-    </section>
+      <div *ngIf="!isLoading">
+        <p class="balance-amount">{{ (accountBalance | number: '1.2-2') || '0.00' }} DH</p>
+        <p class="account-number">
+          <i class="fas fa-credit-card"></i> {{ currentUser?.accountNumber }}
+        </p>
+      </div>
+    </div>
+  </div>
 
-    <section class="recent-operations">
-      <h2>Opérations Récentes</h2>
-      <div *ngIf="isLoading" class="loading-state">
-        Chargement des opérations...
-      </div>
-      <div *ngIf="!isLoading && recentOperations.length > 0; else noOperations" class="operations-list">
-        <div *ngFor="let op of recentOperations" class="operation-item">
-          <div class="operation-header">
-            <span class="operation-type">{{ op.type || 'N/A' }}</span>
-            <span class="operation-status" [ngClass]="'status-' + (op.status ? op.status.toLowerCase() : 'unknown')">
-              {{ op.status || 'En attente' }}
-            </span>
-          </div>
-          <div class="operation-details">
-            <span class="amount">{{ op.amount }} {{ op.currency }}</span>
-            <span class="date">{{ op.createdAt | date: 'short' }}</span>
-          </div>
+  <!-- Navigation Menu -->
+  <div class="nav-section">
+    <div class="section-header">
+      <i class="fas fa-wallet"></i>
+      <span>Opérations Bancaires</span>
+    </div>
+    <div class="nav-grid">
+      <a routerLink="/client/deposit" class="nav-btn">
+        <div class="nav-icon deposit">
+          <i class="fas fa-plus-circle"></i>
         </div>
+        <div class="nav-text">
+          <span class="nav-title">Dépôt</span>
+          <span class="nav-desc">Ajouter des fonds</span>
+        </div>
+      </a>
+      <a routerLink="/client/withdrawal" class="nav-btn">
+        <div class="nav-icon withdrawal">
+          <i class="fas fa-minus-circle"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Retrait</span>
+          <span class="nav-desc">Retirer des fonds</span>
+        </div>
+      </a>
+      <a routerLink="/client/transfer" class="nav-btn">
+        <div class="nav-icon transfer">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Virement</span>
+          <span class="nav-desc">Transférer de l'argent</span>
+        </div>
+      </a>
+      <a routerLink="/client/operations" class="nav-btn">
+        <div class="nav-icon history">
+          <i class="fas fa-history"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Historique</span>
+          <span class="nav-desc">Voir les opérations</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Operations -->
+  <div class="operations-section">
+    <div class="section-header">
+      <i class="fas fa-clock"></i>
+      <span>Opérations Récentes</span>
+    </div>
+    <div class="operations-box">
+      <div *ngIf="isLoading" class="loading-text">
+        <span class="loader"></span> Chargement...
       </div>
-      <ng-template #noOperations>
-        <p class="no-data" *ngIf="!isLoading">Aucune opération disponible</p>
-      </ng-template>
-    </section>
-  </main>
+      <table *ngIf="!isLoading && recentOperations.length > 0" class="operations-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let op of recentOperations">
+            <td>
+              <div class="type-cell">
+                <i class="fas fa-exchange-alt"></i>
+                <span>{{ op.type || 'N/A' }}</span>
+              </div>
+            </td>
+            <td>{{ op.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td class="amount-cell">{{ op.amount | number:'1.2-2' }} {{ op.currency }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="'status-' + (op.status ? op.status.toLowerCase() : 'pending')">
+                {{ op.status || 'En attente' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!isLoading && recentOperations.length === 0" class="no-data">
+        <i class="fas fa-inbox"></i>
+        <p>Aucune opération récente</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button (click)="logout()" class="btn-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Support technique : <strong>5555-1234</strong></p>
+  </div>
+
 </div>
