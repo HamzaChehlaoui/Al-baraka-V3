@@ -1,0 +1,236 @@
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <i class="fas fa-university"></i>
+      <h2>Al Baraka Digital</h2>
+      <span class="subtitle">Administration</span>
+    </div>
+    <div class="user-badge">
+      <i class="fas fa-user-shield"></i>
+      <span>{{ currentUser?.fullName }}</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-tabs">
+    <a routerLink="/admin" class="nav-tab">
+      <i class="fas fa-home"></i> Dashboard
+    </a>
+    <a routerLink="/admin/users" class="nav-tab active">
+      <i class="fas fa-users-cog"></i> Gestion Utilisateurs
+    </a>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Page Header with Filters -->
+  <div class="page-header">
+    <div class="section-header">
+      <i class="fas fa-users"></i>
+      <span>Gestion des Utilisateurs</span>
+    </div>
+    <div class="filters">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          placeholder="Rechercher..."
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+      <select [(ngModel)]="roleFilter" (change)="onFilterChange()" class="filter-select">
+        <option value="">Tous les rôles</option>
+        <option value="CLIENT">Clients</option>
+        <option value="AGENT">Agents</option>
+        <option value="ADMIN">Administrateurs</option>
+      </select>
+      <button (click)="loadUsers()" class="btn-refresh">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="users-section">
+    <div *ngIf="isLoading" class="loading-text">
+      <span class="loader"></span> Chargement des utilisateurs...
+    </div>
+
+    <div *ngIf="!isLoading" class="users-box">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Nom Complet</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Statut</th>
+            <th>N° Compte</th>
+            <th>Date Création</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users" class="user-row" (click)="selectUser(user)">
+            <td>
+              <div class="user-name">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ user.fullName }}</span>
+              </div>
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="role-badge" [ngClass]="user.role ? 'role-' + user.role.toLowerCase() : ''">
+                {{ user.role || '-' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="user.status ? 'status-' + user.status.toLowerCase() : ''">
+                {{ user.status || '-' }}
+              </span>
+            </td>
+            <td>{{ user.accountNumber || '-' }}</td>
+            <td>{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <button class="btn-action" (click)="selectUser(user); $event.stopPropagation()">
+                <i class="fas fa-cog"></i> Gérer
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="7" class="no-data">
+              <i class="fas fa-inbox"></i>
+              <p>Aucun utilisateur trouvé</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalCount > pageSize">
+        <button (click)="previousPage()" [disabled]="currentPage === 0" class="btn-page">
+          <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+        <span class="page-info">Page {{ currentPage + 1 }} sur {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1" class="btn-page">
+          Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button (click)="logout()" class="btn-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Support technique : <strong>5555-1234</strong></p>
+  </div>
+
+</div>
+
+<!-- User Management Modal -->
+<div *ngIf="selectedUser" class="modal-overlay" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Gérer l'utilisateur</h3>
+      <button (click)="closeModal()" class="btn-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- User Info -->
+      <div class="user-info-card">
+        <div class="user-avatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+          <h4>{{ selectedUser.fullName }}</h4>
+          <p>{{ selectedUser.email }}</p>
+          <div class="badges">
+            <span class="role-badge" [ngClass]="selectedUser.role ? 'role-' + selectedUser.role.toLowerCase() : ''">
+              {{ selectedUser.role || '-' }}
+            </span>
+            <span class="status-badge" [ngClass]="selectedUser.status ? 'status-' + selectedUser.status.toLowerCase() : ''">
+              {{ selectedUser.status || '-' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Actions -->
+      <div class="action-section">
+        <label>Changer le statut</label>
+        <div class="action-buttons">
+          <button
+            (click)="activateUser()"
+            [disabled]="actionInProgress || selectedUser.status === 'ACTIVE'"
+            class="btn-status active"
+          >
+            <i class="fas fa-check"></i> Activer
+          </button>
+          <button
+            (click)="deactivateUser()"
+            [disabled]="actionInProgress || selectedUser.status === 'INACTIVE'"
+            class="btn-status inactive"
+          >
+            <i class="fas fa-pause"></i> Désactiver
+          </button>
+          <button
+            (click)="suspendUser()"
+            [disabled]="actionInProgress || selectedUser.status === 'SUSPENDED'"
+            class="btn-status suspended"
+          >
+            <i class="fas fa-ban"></i> Suspendre
+          </button>
+        </div>
+      </div>
+
+      <!-- Role Actions -->
+      <div class="action-section">
+        <label>Changer le rôle</label>
+        <div class="action-buttons">
+          <button
+            (click)="changeRole('CLIENT')"
+            [disabled]="actionInProgress || selectedUser.role === 'CLIENT'"
+            class="btn-role client"
+          >
+            <i class="fas fa-user"></i> Client
+          </button>
+          <button
+            (click)="changeRole('AGENT')"
+            [disabled]="actionInProgress || selectedUser.role === 'AGENT'"
+            class="btn-role agent"
+          >
+            <i class="fas fa-user-tie"></i> Agent
+          </button>
+          <button
+            (click)="changeRole('ADMIN')"
+            [disabled]="actionInProgress || selectedUser.role === 'ADMIN'"
+            class="btn-role admin"
+          >
+            <i class="fas fa-user-shield"></i> Admin
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="actionInProgress" class="action-loading">
+        <span class="loader-small"></span>
+        <span>Action en cours...</span>
+      </div>
+    </div>
+  </div>
+</div>
