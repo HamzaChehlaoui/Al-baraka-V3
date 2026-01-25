@@ -1,0 +1,147 @@
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <i class="fas fa-university"></i>
+      <h2>Al Baraka Digital</h2>
+      <span class="subtitle">Agent Bancaire</span>
+    </div>
+    <div class="user-badge">
+      <i class="fas fa-id-badge"></i>
+      <span>{{ currentUser?.fullName }}</span>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="section-header">
+      <i class="fas fa-chart-bar"></i>
+      <span>Statistiques</span>
+    </div>
+    <div *ngIf="isLoading" class="loading-text">
+      <span class="loader"></span> Chargement...
+    </div>
+    <div *ngIf="!isLoading" class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ pendingOperationsCount }}</span>
+          <span class="stat-label">En Attente</span>
+        </div>
+      </div>
+      <div class="stat-card deposit">
+        <div class="stat-icon">
+          <i class="fas fa-plus-circle"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ pendingDeposits }}</span>
+          <span class="stat-label">Dépôts</span>
+        </div>
+      </div>
+      <div class="stat-card withdrawal">
+        <div class="stat-icon">
+          <i class="fas fa-minus-circle"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ pendingWithdrawals }}</span>
+          <span class="stat-label">Retraits</span>
+        </div>
+      </div>
+      <div class="stat-card transfer">
+        <div class="stat-icon">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ pendingTransfers }}</span>
+          <span class="stat-label">Virements</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Section -->
+  <div class="nav-section">
+    <div class="section-header">
+      <i class="fas fa-tools"></i>
+      <span>Actions Rapides</span>
+    </div>
+    <div class="nav-grid">
+      <a routerLink="/agent/pending-operations" class="nav-btn">
+        <div class="nav-icon primary">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Traiter les Opérations</span>
+          <span class="nav-desc">Approuver ou rejeter</span>
+        </div>
+        <span *ngIf="pendingOperationsCount > 0" class="nav-badge">{{ pendingOperationsCount }}</span>
+      </a>
+      <button (click)="loadAgentData()" class="nav-btn">
+        <div class="nav-icon refresh">
+          <i class="fas fa-sync-alt"></i>
+        </div>
+        <div class="nav-text">
+          <span class="nav-title">Actualiser</span>
+          <span class="nav-desc">Mettre à jour les données</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Operations -->
+  <div *ngIf="!isLoading" class="operations-section">
+    <div class="section-header">
+      <i class="fas fa-clock"></i>
+      <span>Opérations Récentes en Attente</span>
+    </div>
+    <div class="operations-box">
+      <table *ngIf="recentPendingOperations.length > 0" class="operations-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Compte</th>
+            <th>Montant</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let op of recentPendingOperations">
+            <td>
+              <div class="type-cell">
+                <i [class]="getOperationIcon(op.type)"></i>
+                <span>{{ getOperationTypeLabel(op.type) }}</span>
+              </div>
+            </td>
+            <td>{{ op.accountNumber }}</td>
+            <td class="amount-cell">{{ op.amount | number:'1.2-2' }} DH</td>
+            <td>{{ op.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="recentPendingOperations.length === 0" class="no-data">
+        <i class="fas fa-check-circle"></i>
+        <p>Aucune opération en attente</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button (click)="logout()" class="btn-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Support technique : <strong>5555-1234</strong></p>
+  </div>
+
+</div>
