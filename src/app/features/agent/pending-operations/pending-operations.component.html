@@ -1,0 +1,246 @@
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="bank-header">
+    <div class="bank-logo">
+      <i class="fas fa-university"></i>
+      <h2>Al Baraka Digital</h2>
+      <span class="subtitle">Agent Bancaire</span>
+    </div>
+    <div class="user-badge">
+      <i class="fas fa-id-badge"></i>
+      <span>{{ currentUser?.fullName }}</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-tabs">
+    <a routerLink="/agent" class="nav-tab">
+      <i class="fas fa-home"></i> Dashboard
+    </a>
+    <a routerLink="/agent/pending-operations" class="nav-tab active">
+      <i class="fas fa-tasks"></i> Opérations en Attente
+    </a>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="section-header">
+      <i class="fas fa-hourglass-half"></i>
+      <span>Opérations en Attente d'Approbation</span>
+    </div>
+    <button (click)="loadPendingOperations()" class="btn-refresh">
+      <i class="fas fa-sync-alt"></i> Actualiser
+    </button>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+    <!-- Operations List -->
+    <div class="operations-panel">
+      <div *ngIf="isLoading" class="loading-text">
+        <span class="loader"></span> Chargement des opérations...
+      </div>
+
+      <div *ngIf="!isLoading && pendingOperations.length > 0" class="operations-list">
+        <div
+          *ngFor="let op of pendingOperations"
+          class="operation-card"
+          (click)="selectOperation(op)"
+          [class.selected]="selectedOperation?.id === op.id"
+        >
+          <div class="op-icon" [ngClass]="getOperationClass(op.type)">
+            <i [class]="getOperationIcon(op.type)"></i>
+          </div>
+          <div class="op-info">
+            <div class="op-header">
+              <span class="op-type">{{ getOperationTypeLabel(op.type) }}</span>
+              <span class="op-amount">{{ op.amount | number:'1.2-2' }} {{ op.currency }}</span>
+            </div>
+            <div class="op-meta">
+              <span><i class="fas fa-credit-card"></i> {{ op.accountNumber }}</span>
+              <span><i class="fas fa-clock"></i> {{ op.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div *ngIf="op.documents && op.documents.length > 0" class="op-doc">
+              <i class="fas fa-paperclip"></i> Justificatif attaché
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && pendingOperations.length === 0" class="no-data">
+        <i class="fas fa-check-circle"></i>
+        <p>Aucune opération en attente d'approbation</p>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!isLoading && pendingOperations.length > 0 && totalPages > 1" class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage === 1" class="btn-page">
+          <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+        <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="btn-page">
+          Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Details Panel -->
+    <div class="details-panel">
+      <div *ngIf="selectedOperation" class="details-content">
+        <div class="details-header">
+          <h3>Détails de l'Opération</h3>
+          <button (click)="closeDetails()" class="btn-close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="details-body">
+          <div class="detail-row">
+            <label>ID Opération</label>
+            <span>{{ selectedOperation.id }}</span>
+          </div>
+
+          <div class="detail-row">
+            <label>Type</label>
+            <span class="type-badge" [ngClass]="getOperationClass(selectedOperation.type)">
+              <i [class]="getOperationIcon(selectedOperation.type)"></i>
+              {{ getOperationTypeLabel(selectedOperation.type) }}
+            </span>
+          </div>
+
+          <div class="detail-row highlight">
+            <label>Montant</label>
+            <span class="amount-large">{{ selectedOperation.amount | number:'1.2-2' }} {{ selectedOperation.currency }}</span>
+          </div>
+
+          <div class="detail-row">
+            <label>Compte Client</label>
+            <span>{{ selectedOperation.accountNumber }}</span>
+          </div>
+
+          <div *ngIf="selectedOperation.recipientAccountNumber" class="detail-row">
+            <label>Compte Destinataire</label>
+            <span>{{ selectedOperation.recipientAccountNumber }}</span>
+          </div>
+
+          <div class="detail-row">
+            <label>Description</label>
+            <span>{{ selectedOperation.description || 'Aucune description' }}</span>
+          </div>
+
+          <div class="detail-row">
+            <label>Date de Création</label>
+            <span>{{ selectedOperation.createdAt | date: 'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+
+          <!-- Justificatif -->
+          <div *ngIf="selectedOperation.documents && selectedOperation.documents.length > 0" class="doc-section">
+            <label><i class="fas fa-paperclip"></i> Justificatif Attaché</label>
+            <div class="doc-preview">
+              <img
+                *ngIf="selectedOperation.documents[0].fileType?.startsWith('image/')"
+                [src]="getDocumentViewUrl(selectedOperation.documents[0].id)"
+                [alt]="selectedOperation.documents[0].fileName"
+                class="doc-image"
+                (click)="openImageModal(selectedOperation.documents[0])"
+              />
+              <div *ngIf="!selectedOperation.documents[0].fileType?.startsWith('image/')" class="doc-file">
+                <i class="fas fa-file-pdf"></i>
+                <span>{{ selectedOperation.documents[0].fileName }}</span>
+              </div>
+            </div>
+            
+          </div>
+
+          <div *ngIf="(!selectedOperation.documents || selectedOperation.documents.length === 0) && selectedOperation.amount > 10000" class="warning-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            Aucun justificatif pour un montant > 10 000 DH
+          </div>
+        </div>
+
+        <div class="details-footer">
+          <button (click)="approveOperation()" [disabled]="actionInProgress" class="btn-approve">
+            <i class="fas fa-check"></i>
+            {{ actionInProgress ? 'Traitement...' : 'Approuver' }}
+          </button>
+          <button (click)="openRejectModal()" [disabled]="actionInProgress" class="btn-reject">
+            <i class="fas fa-times"></i>
+            {{ actionInProgress ? 'Traitement...' : 'Rejeter' }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!selectedOperation" class="no-selection">
+        <i class="fas fa-hand-pointer"></i>
+        <p>Sélectionnez une opération pour voir les détails</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Button -->
+  <button (click)="logout()" class="btn-logout">
+    <i class="fas fa-sign-out-alt"></i>
+    Déconnexion
+  </button>
+
+  <!-- Footer -->
+  <div class="dashboard-footer">
+    <p>Support technique : <strong>5555-1234</strong></p>
+  </div>
+
+</div>
+
+<!-- Reject Modal -->
+<div *ngIf="showRejectModal" class="modal-overlay" (click)="closeRejectModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Rejeter l'Opération</h3>
+      <button (click)="closeRejectModal()" class="btn-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Veuillez indiquer la raison du rejet :</p>
+      <textarea
+        [(ngModel)]="rejectReason"
+        placeholder="Raison du rejet..."
+        rows="4"
+        class="reject-textarea"
+      ></textarea>
+    </div>
+    <div class="modal-footer">
+      <button (click)="closeRejectModal()" class="btn-secondary">Annuler</button>
+      <button
+        (click)="rejectOperation()"
+        [disabled]="!rejectReason.trim() || actionInProgress"
+        class="btn-reject"
+      >
+        {{ actionInProgress ? 'Traitement...' : 'Confirmer le Rejet' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Viewer Modal -->
+<div *ngIf="showDocumentViewer" class="modal-overlay" (click)="closeDocumentViewer()">
+  <div class="modal modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ selectedDocument?.fileName || 'Justificatif' }}</h3>
+      <button (click)="closeDocumentViewer()" class="btn-close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body image-viewer">
+      <img *ngIf="selectedDocument" [src]="getDocumentViewUrl(selectedDocument.id)" [alt]="selectedDocument.fileName" class="full-image" />
+    </div>
+  </div>
+</div>
